@@ -1,3 +1,5 @@
+package com.sematek.StrainGauge;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 

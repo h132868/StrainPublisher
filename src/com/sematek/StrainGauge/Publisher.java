@@ -1,4 +1,5 @@
-import com.oracle.tools.packager.Log;
+package com.sematek.StrainGauge;
+
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
