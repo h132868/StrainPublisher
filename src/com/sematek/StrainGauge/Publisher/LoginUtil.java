@@ -1,9 +1,9 @@
-package com.sematek.StrainGauge;
+package com.sematek.StrainGauge.Publisher;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 
-public class LoginDetails {
+public class LoginUtil {
 
     private static String[] username = new String[4];
     private static final String[] password = new String[4];
@@ -14,7 +14,7 @@ public class LoginDetails {
     private static final String[] topic = new String[4];
     private static final String serverUrl = "m20.cloudmqtt.com";
 
-    LoginDetails() {
+    LoginUtil() {
         username[0] = "vjkulmgc";
         username[1] = "rnbptasw";
         username[2] = "pssweqsv";

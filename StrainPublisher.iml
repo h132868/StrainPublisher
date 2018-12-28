@@ -9,5 +9,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="com.fazecast:jSerialComm:2.4.0" level="project" />
     <orderEntry type="library" name="org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.0.2" level="project" />
+    <orderEntry type="library" name="org.mongodb:mongodb-driver:3.9.1" level="project" />
   </component>
 </module>

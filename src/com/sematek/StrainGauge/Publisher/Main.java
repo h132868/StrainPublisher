@@ -1,4 +1,4 @@
-package com.sematek.StrainGauge;
+package com.sematek.StrainGauge.Publisher;
 
 import org.eclipse.paho.client.mqttv3.MqttException;
 
