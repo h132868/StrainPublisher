@@ -1,4 +1,4 @@
-package com.sematek.StrainGauge.Publisher;
+package Util;
 
 import java.net.URI;
 import java.net.URISyntaxException;

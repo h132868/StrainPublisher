@@ -1,27 +1,35 @@
-package com.sematek.StrainGauge.Archiver;
+package com.sematek.StrainGauge.controller;
+        import Util.LoginUtil;
+        import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+        import org.eclipse.paho.client.mqttv3.MqttCallback;
+        import org.eclipse.paho.client.mqttv3.MqttClient;
+        import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+        import org.eclipse.paho.client.mqttv3.MqttException;
+        import org.eclipse.paho.client.mqttv3.MqttMessage;
+        import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
-import Util.LoginUtil;
-import org.eclipse.paho.client.mqttv3.*;
-import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
+        import java.net.URI;
+        import java.net.URISyntaxException;
 
-import java.net.URI;
-import java.net.URISyntaxException;
+class Subscriber implements MqttCallback, Runnable {
 
-
-public class Subscriber implements MqttCallback, Runnable {
-
-    private final int sensorId;
-    Archiver archiver;
-
-    private final int qos = 1;
+    private String message;
     private String topic;
+    private int sensorId;
+    private Controller controller;
     private MqttClient client;
+    private int qos;
 
-    Subscriber(int sensorId) throws MqttException, URISyntaxException {
+
+    public Subscriber(int sensorId) {
+        this.topic = LoginUtil.getTopic(sensorId);
         this.sensorId = sensorId;
+        qos = 1;
     }
 
-
+    public void run() {
+            connect();
+    }
     void connect() {
 
 
@@ -39,6 +47,8 @@ public class Subscriber implements MqttCallback, Runnable {
             this.client.setCallback(this);
             this.client.connect(conOpt);
             System.out.println("Connected");
+            client.subscribe(topic, qos);
+            System.out.println("Subscribed to message with topic " + topic + "...");
 
         } catch (MqttException e) {
             System.out.println("reason " + e.getReasonCode());
@@ -55,39 +65,40 @@ public class Subscriber implements MqttCallback, Runnable {
         client.disconnect();
     }
 
-    public void publish(String payload) throws MqttException{
-        MqttMessage message = new MqttMessage(payload.getBytes());
-        message.setQos(qos);
-        client.publish(LoginUtil.getTopic(sensorId),message);
-    }
-
-
     /**
      * @see MqttCallback#connectionLost(Throwable)
      */
     public void connectionLost(Throwable cause) {
         System.out.println("Connection lost because: " + cause);
         System.exit(1);
+
+    }
+
+    /**
+     * @see MqttCallback#messageArrived(String, MqttMessage)
+     */
+    public void messageArrived(String topic, MqttMessage message) throws Exception {
+
+        String dismessage = String.format("[%s] %s", topic, new String(message.getPayload()));
+
+        this.setMessage(new String(message.getPayload()));
+        controller.exportLastValToWeb(getMessage());
     }
 
     /**
      * @see MqttCallback#deliveryComplete(IMqttDeliveryToken)
      */
     public void deliveryComplete(IMqttDeliveryToken token) {
-    }
-    /**
-     * @see MqttCallback#messageArrived(String, MqttMessage)
-     */
-    public void messageArrived(String topic, MqttMessage message) throws Exception {
-
-        System.out.println("Archiver message arrived!");
-        archiver.archiveData(message.toString());
+        // TODO Auto-generated method stub
 
     }
 
-    @Override
-    public void run() {
-
+    public String getMessage() {
+        return message;
     }
+
+    private void setMessage(String message) {
+        this.message = message;
+    }
+
 }
-

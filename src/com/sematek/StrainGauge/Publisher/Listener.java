@@ -2,18 +2,17 @@ package com.sematek.StrainGauge.Publisher;
 
 import com.fazecast.jSerialComm.*;
 import org.eclipse.paho.client.mqttv3.MqttException;
-
 import java.net.URISyntaxException;
-
+import java.time.Instant;
 import static java.lang.Thread.sleep;
 
 public class Listener implements Runnable{
 
-    SerialPort comPort;
-    Publisher publisher;
-    int sensorId;
-    String payload;
-    String newPayload;
+    private SerialPort comPort;
+    private Publisher publisher;
+    private int sensorId;
+    private String payload;
+    private Instant timestamp;
 
 
 
@@ -21,26 +20,41 @@ public class Listener implements Runnable{
 
         comPort= SerialPort.getCommPort(new String("COM"+comPortNumber));
         sensorId = comPortNumber;
-        Publisher publisher = new Publisher(sensorId);
+        publisher = new Publisher(sensorId);
     }
 
     public void run() {
+        System.out.println("Listener running on port " + sensorId + "...");
+        comPort = SerialPort.getCommPorts()[0];
         comPort.openPort();
-        comPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 100, 0);
-        try {
-            while (true)
+        comPort.addDataListener(new SerialPortDataListener() {
+            @Override
+            public int getListeningEvents() { return SerialPort.LISTENING_EVENT_DATA_AVAILABLE; }
+            @Override
+            public void serialEvent(SerialPortEvent event)
             {
-                byte[] readBuffer = new byte[1024];
-                newPayload = readBuffer.toString();
-                if (!newPayload.equals(payload)) {
-                    publisher.publish(payload);
-                }
-                payload = newPayload;
-                int numRead = comPort.readBytes(readBuffer, readBuffer.length);
+                if (event.getEventType() != SerialPort.LISTENING_EVENT_DATA_AVAILABLE)
+                    return;
+                byte[] newData = new byte[comPort.bytesAvailable()];
+                int numRead = comPort.readBytes(newData, newData.length);
                 System.out.println("Read " + numRead + " bytes.");
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        });
+
+        if (comPort.bytesAvailable()>1) {
+            byte[] buffer = new byte[1024];
+            payload = String.valueOf(comPort.readBytes(buffer, comPort.bytesAvailable()));
+            timestamp = Instant.EPOCH;
+            try {
+                publisher.publish(payload, timestamp.toString());
+            } catch (MqttException e) {
+                e.printStackTrace();
+            }
+
+        }
         comPort.closePort();
+
+
         try {
             sleep(100);
         } catch (InterruptedException e) {
@@ -50,5 +64,7 @@ public class Listener implements Runnable{
     public int getSensorId() {
         return sensorId;
     }
+
+
 
 }

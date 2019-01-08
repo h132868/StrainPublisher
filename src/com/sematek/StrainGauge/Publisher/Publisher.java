@@ -1,5 +1,6 @@
 package com.sematek.StrainGauge.Publisher;
 
+import Util.LoginUtil;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
@@ -52,9 +53,11 @@ public class Publisher implements MqttCallback {
         client.disconnect();
     }
 
-    public void publish(String payload) throws MqttException{
-        MqttMessage message = new MqttMessage(payload.getBytes());
+    public void publish(String readData, String timestamp) throws MqttException{
+        MqttMessage message = new MqttMessage();
         message.setQos(qos);
+        String payloadStr = ("{data: " + readData + ", " + "epoch: " + timestamp +"}");
+        message.setPayload(payloadStr.getBytes());
         client.publish(LoginUtil.getTopic(sensorId),message);
     }
 
