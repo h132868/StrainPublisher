@@ -11,5 +11,18 @@
     <orderEntry type="library" name="com.fazecast:jSerialComm:2.4.0" level="project" />
     <orderEntry type="library" name="org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.0.2" level="project" />
     <orderEntry type="library" name="org.mongodb:mongodb-driver:3.9.1" level="project" />
+    <orderEntry type="module-library" scope="TEST">
+      <library name="JUnit5.3">
+        <CLASSES>
+          <root url="jar://$MAVEN_REPOSITORY$/org/junit/jupiter/junit-jupiter-api/5.4.0-M1/junit-jupiter-api-5.4.0-M1.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/apiguardian/apiguardian-api/1.0.0/apiguardian-api-1.0.0.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/opentest4j/opentest4j/1.1.1/opentest4j-1.1.1.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/junit/platform/junit-platform-commons/1.4.0-M1/junit-platform-commons-1.4.0-M1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="library" name="com.fasterxml.jackson.core:jackson-databind:2.9.8" level="project" />
   </component>
 </module>

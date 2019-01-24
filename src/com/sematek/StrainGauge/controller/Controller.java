@@ -1,6 +1,9 @@
 package com.sematek.StrainGauge.controller;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
 
 // Gets live data for use by the web part. Lookup of content from MongoDB from a different place.
 public class Controller {
@@ -13,7 +16,28 @@ public class Controller {
     }
 
 
-    public double parseInput(String str) {
+    public SensorMessage parseInput(String jsonInString) {
+        ObjectMapper mapper = new ObjectMapper();
+        SensorMessage sensorMessage = null;
+        try {
+            // Convert JSON string to Object
+            sensorMessage = mapper.readValue(jsonInString, SensorMessage.class);
+            System.out.println(sensorMessage);
+
+            //Pretty print
+            String prettySensorMessage = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(sensorMessage);
+            System.out.println(prettySensorMessage);
+
+        } catch (JsonGenerationException e) {
+            e.printStackTrace();
+        } catch (JsonMappingException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return sensorMessage;
+
+    /*
         String regex = "[0-9]+.[0-9]+";
         Pattern p = Pattern.compile(regex);
         Matcher m = p.matcher(str);
@@ -22,10 +46,12 @@ public class Controller {
         } else {
             return 0.0;
         }
+        */
     }
 
     //TODO:
     public void exportLastValToWeb(String message) {
-        sensorVal = parseInput(message);
+        System.out.println(message);
+        System.out.println(parseInput(message));
     }
 }

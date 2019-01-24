@@ -25,21 +25,27 @@ public class Listener implements Runnable{
 
     public void run() {
         System.out.println("Listener running on port " + sensorId + "...");
+        if (SerialPort.getCommPorts().length == 0) {
+            System.out.println("It appears there is no connected serial devices available. Shutting down.");
+            return;
+        }
         comPort = SerialPort.getCommPorts()[0];
         comPort.openPort();
         comPort.addDataListener(new SerialPortDataListener() {
             @Override
-            public int getListeningEvents() { return SerialPort.LISTENING_EVENT_DATA_AVAILABLE; }
+            public int getListeningEvents() {
+                return SerialPort.LISTENING_EVENT_DATA_AVAILABLE;
+            }
+
             @Override
-            public void serialEvent(SerialPortEvent event)
-            {
+            public void serialEvent(SerialPortEvent event) {
                 if (event.getEventType() != SerialPort.LISTENING_EVENT_DATA_AVAILABLE)
                     return;
                 byte[] newData = new byte[comPort.bytesAvailable()];
                 int numRead = comPort.readBytes(newData, newData.length);
                 System.out.println("Read " + numRead + " bytes.");
             }
-        });
+            });
 
         if (comPort.bytesAvailable()>1) {
             byte[] buffer = new byte[1024];

@@ -49,14 +49,16 @@ public class Publisher implements MqttCallback {
             e.printStackTrace();
         }
     }
-    private void disconnect() throws MqttException {
+    void disconnect() throws MqttException {
         client.disconnect();
+        client.close();
     }
 
     public void publish(String readData, String timestamp) throws MqttException{
         MqttMessage message = new MqttMessage();
+        message.setRetained(true);
         message.setQos(qos);
-        String payloadStr = ("{data: " + readData + ", " + "epoch: " + timestamp +"}");
+        String payloadStr = ("{\"data\": \"" + readData + "\", " + "\"epoch\": \"" + timestamp +"\"}");
         message.setPayload(payloadStr.getBytes());
         client.publish(LoginUtil.getTopic(sensorId),message);
     }

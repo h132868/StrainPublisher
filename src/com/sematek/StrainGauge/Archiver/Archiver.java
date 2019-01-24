@@ -21,11 +21,11 @@ public class Archiver {
     DBCollection collection;
 
     public Archiver(int sensorId) throws MqttException, URISyntaxException {
-        MongoClientURI uri = new MongoClientURI("mongodb+srv://inception:<PASSWORD>@cluster0-puaeg.mongodb.net/test?retryWrites=true");
+        MongoClientURI uri = new MongoClientURI("mongodb+srv://inception:OPGtoJ3DfRbL9RX9@cluster0-puaeg.mongodb.net/test?retryWrites=true");
         mongoClient = new MongoClient(uri);
         database = mongoClient.getDB("test");
         subscriber = new Subscriber(sensorId);
-        collection = database.getCollection("sensor + sensorId");
+        collection = database.getCollection("sensor" + sensorId);
 
     }
 
