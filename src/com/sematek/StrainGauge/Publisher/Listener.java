@@ -9,6 +9,7 @@ import static java.lang.Thread.sleep;
 public class Listener implements Runnable{
 
     private SerialPort comPort;
+    private int comPortNumber;
     private Publisher publisher;
     private int sensorId;
     private String payload;
@@ -16,15 +17,15 @@ public class Listener implements Runnable{
 
 
 
-    Listener(int comPortNumber) throws URISyntaxException, MqttException {
+    Listener(int comPortNumber, int sensorNumber) throws URISyntaxException, MqttException {
 
         comPort= SerialPort.getCommPort(new String("COM"+comPortNumber));
         sensorId = comPortNumber;
-        publisher = new Publisher(sensorId);
+        publisher = new Publisher(sensorNumber);
     }
 
     public void run() {
-        System.out.println("Listener running on port " + sensorId + "...");
+        System.out.println("Listener running on port " + comPortNumber + "...");
         if (SerialPort.getCommPorts().length == 0) {
             System.out.println("It appears there is no connected serial devices available. Shutting down.");
             return;
@@ -67,10 +68,7 @@ public class Listener implements Runnable{
             e.printStackTrace();
         }
     }
-    public int getSensorId() {
-        return sensorId;
+    public int getComPortNumber() {
+        return comPortNumber;
     }
-
-
-
 }

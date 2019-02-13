@@ -18,7 +18,7 @@ class PublisherTest {
 
     @Test
     void publish() throws MqttException, URISyntaxException {
-        String payload = "999.99";
+        String payload = "555.99";
         String dateTimeEpoch = "1547720904";
         Publisher p = new Publisher(0);
         p.connect();

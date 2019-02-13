@@ -9,30 +9,28 @@ import java.net.URISyntaxException;
 
 public class Publisher implements MqttCallback {
 
-    private final int sensorId;
-
     private final int qos = 1;
     private String topic;
+    private int sensorNumber;
     private MqttClient client;
 
-    Publisher(int sensorId) throws MqttException, URISyntaxException {
-        this.sensorId = sensorId;
-    }
-
+    Publisher(int sensorNumber) throws MqttException, URISyntaxException {
+    this.sensorNumber = sensorNumber;
+}
 
     void connect() {
 
 
         try {
-            URI uri = LoginUtil.getURI(sensorId);
-            this.topic = LoginUtil.getTopic(sensorId);
+            URI uri = LoginUtil.getURI();
+            this.topic = LoginUtil.getTopic(sensorNumber);
             String host = String.format("tcp://%s:%d", uri.getHost(), uri.getPort());
 
             this.client = new MqttClient(host, LoginUtil.getClientId(), new MemoryPersistence());
             MqttConnectOptions conOpt = new MqttConnectOptions();
             conOpt.setCleanSession(true);
-            conOpt.setUserName(LoginUtil.getUsername(sensorId));
-            conOpt.setPassword( LoginUtil.getPassword(sensorId).toCharArray());
+            conOpt.setUserName(LoginUtil.getUsername());
+            conOpt.setPassword( LoginUtil.getPassword().toCharArray());
             System.out.println("Connecting to broker...");
             this.client.setCallback(this);
             this.client.connect(conOpt);
@@ -58,9 +56,9 @@ public class Publisher implements MqttCallback {
         MqttMessage message = new MqttMessage();
         message.setRetained(true);
         message.setQos(qos);
-        String payloadStr = ("{\"data\": \"" + readData + "\", " + "\"epoch\": \"" + timestamp +"\"}");
+        String payloadStr = ("{{\"sensordata\":{\"data\": \"" + readData + "\", " + "\"unixTimestamp\": \"" + timestamp +"\"}}");
         message.setPayload(payloadStr.getBytes());
-        client.publish(LoginUtil.getTopic(sensorId),message);
+        client.publish(topic,message);
     }
 
     private String[] getAuth(URI uri) {

@@ -7,7 +7,7 @@ import java.net.URISyntaxException;
 public class Main {
 
     public static void main(String[] args) throws MqttException, URISyntaxException, InterruptedException {
-        Listener l1 = new Listener(0);
+        Listener l1 = new Listener(0,0);
         /*Listener l2 = new Listener(1);
         Listener l3 = new Listener(2);
         Listener l4 = new Listener(3);*/

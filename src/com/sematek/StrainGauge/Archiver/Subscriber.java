@@ -10,15 +10,17 @@ import java.net.URISyntaxException;
 
 public class Subscriber implements MqttCallback, Runnable {
 
-    private final int sensorId;
+    private final int sensorNumber;
     Archiver archiver;
 
     private final int qos = 1;
     private String topic;
     private MqttClient client;
 
-    Subscriber(int sensorId) throws MqttException, URISyntaxException {
-        this.sensorId = sensorId;
+    Subscriber(int sensorNumber) throws MqttException, URISyntaxException {
+        this.sensorNumber = sensorNumber;
+        archiver = new Archiver();
+        archiver.ensureTopicExistsInDB(LoginUtil.getTopic(sensorNumber),LoginUtil.getTopicDescription(sensorNumber));
     }
 
 
@@ -26,15 +28,15 @@ public class Subscriber implements MqttCallback, Runnable {
 
 
         try {
-            URI uri = LoginUtil.getURI(sensorId);
-            this.topic = LoginUtil.getTopic(sensorId);
+            URI uri = LoginUtil.getURI();
+            this.topic = LoginUtil.getTopic(sensorNumber);
             String host = String.format("tcp://%s:%d", uri.getHost(), uri.getPort());
 
             this.client = new MqttClient(host, LoginUtil.getClientId(), new MemoryPersistence());
             MqttConnectOptions conOpt = new MqttConnectOptions();
             conOpt.setCleanSession(true);
-            conOpt.setUserName(LoginUtil.getUsername(sensorId));
-            conOpt.setPassword( LoginUtil.getPassword(sensorId).toCharArray());
+            conOpt.setUserName(LoginUtil.getUsername());
+            conOpt.setPassword( LoginUtil.getPassword().toCharArray());
             System.out.println("Connecting to broker...");
             this.client.setCallback(this);
             this.client.connect(conOpt);
@@ -58,7 +60,7 @@ public class Subscriber implements MqttCallback, Runnable {
     public void publish(String payload) throws MqttException{
         MqttMessage message = new MqttMessage(payload.getBytes());
         message.setQos(qos);
-        client.publish(LoginUtil.getTopic(sensorId),message);
+        client.publish(LoginUtil.getTopic(sensorNumber),message);
     }
 
 
